@@ -24,13 +24,14 @@ dbpasswd = '1q2w3e'
 dbdatabase = 'image_test'
 dbcharset = 'utf8'
 
-table_name = 'repo'
+table_name = None#'repo'
 my = mc()
 im = ima()
 ut = utl()
 
 DIM = 5120
 argv = None
+arg_insMath = False
 
 def prepare():
     # 데이터를 넣기 위한 준비.
@@ -81,18 +82,27 @@ def searchFileAndimproc(initroot):
                             darray.extend(dummy)
 
                         """
+                            # 공통 사항
                             영상을 Sift로 변환하여 만든 Feature 정보는 항상 Scale invarient하다.
                             따라서 LSH를 썼을때 어떠한 벡터의 일부분은 비교하는 이미지와 거의 동일한 Document일 것이고,
                             따라서 hash값이 일치 할 가능성이 높다(Hash의 Collision 현상을 최대한 활용).
-                            또한, sift의 벡터의 각도는 0부터 180 미만(영상에서 생성되는 벡터의 최소 및 최대값)이며 따라서 배열이 정수로 나오게 된다.
+                            또한, sift의 벡터의 각도는 0부터 255 미만(영상에서 생성되는 벡터의 최소 및 최대값)이며 따라서 배열이 정수로 나오게 된다.
+
+                            # 1. for DataSearcher1
                             이를 nearpy에 집어넣어 유사성을 찾기 위해서는, 1미만의 부동소숫점이 되어야 하는데, 이를 처리하기 위해서
                             일부러 Array를 1 미만으로 정규화 시켜주어야 한다.
+
+                            # 2. for DataSearcher2
+                            별도의 Inserter를 구현하였기 때문에, 정규화의 처리 없이 그냥 넘어가도 상관없다.
                         """
-                        # 값의 정규화를 위해 처리
-                        darray[:] = [x / 180.0 for x in darray]
+                        if arg_insMath is False:
+                            # 값의 정규화를 위해 처리.
+                            darray[:] = [x / 255.0 for x in darray]
+                            # 위를 그대로 쓰면 BLOB 최대 값인 64k를 넘으므로 오류가 발생.
+                            darray = [round(elem, 6) for elem in darray]
 
                         # DB에 넣을 최종 Feature Data 생성
-                        featurebin_data = str(darray)
+                        featurebin_data = str(darray).strip('[]')
 
                         # store binary string and Filename to MySQL DB(파일 이름 정규화).
                         s = path.replace(initroot, '')
@@ -121,7 +131,11 @@ def confirmTableStatus():
         rowcnt = my.execQuery("SHOW TABLE " + table_name + ";")
 
         # 테이블 자료 확인.
-        if rowcnt is not 0:
+        if rowcnt is 0:
+            pass
+        elif rowcnt is None:
+            pass
+        else:
             dataRowCnt = my.execQuery("SELECT * FROM " + table_name + ";")
 
             # 테이블 자료 없을 때 집어넣고 생성.
@@ -136,17 +150,32 @@ def confirmTableStatus():
 
 if __name__ == '__main__':
     # Sys Argument
-    argv = str(sys.argv[0])
-    #it's debug pass
-    argv = "/Users/invi/Downloads/goods_classify_11st_sample/"
+    argv = ['', '', '']
 
-    if argv == '' or None:
+    for i in range(len(sys.argv)):
+        argv[i] = str(sys.argv[i])
+
+    #it's debug pass
+    #argv[0] = 'repo'
+    argv[1] = "/Users/invi/Downloads/goods_classify_11st_sample/"
+    #argv[2] = '-NoReg'
+
+    if argv[0] == '':
+        print "you must setting on DB Table name."
+        pass
+    else:
+        table_name = argv[0]
+
+    if argv[2] == '-NoReg':
+        arg_insMath = True
+
+    if (argv[0] == '' or argv[1] == ''):
         # 아규먼트가 없을 경우
-        print "No Argument.\nEnd."
+        print "No input Argument.\nEnd."
         pass
     else:
         # 아규먼트가 있을 경우 처리.
-        imageDataPath = argv
+        imageDataPath = argv[1]
 
         if imageDataPath is '' or None:
             # 데이터의 Path가 없는 경우.

@@ -1,4 +1,4 @@
-__author__ = 'invi'
+__author__ = 'Doohoon Kim'
 
 import numpy
 import scipy

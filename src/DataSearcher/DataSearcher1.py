@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__author__ = 'invi'
+__author__ = 'Doohoon Kim'
 
 import sys
 import os
@@ -93,7 +93,7 @@ def insDatabaseDatas():
     t1 = time.time()
     print '데이터 삽입 시간 : %f seconds' % (t1-t0)
 
-    print '데이터 삽입...'
+    print '데이터 커밋...'
     t0 = time.time()
 
     ls.commitData()
@@ -112,7 +112,7 @@ def imageInput(path):
 
 def findData(path):
     # 데이터 불러오기 및 비교부.
-    print '비교 데이터 삽입 및 같은 값 찾기...'
+    print '비교 데이터 삽입 및 검색 찾기...'
     t0 = time.time()
     feature = imageInput(path)
 
@@ -133,13 +133,13 @@ def findData(path):
         dummy = [0.0] * (DIM - len(darray))
         darray.extend(dummy)
 
-    # 값의 정규화를 위해 처리
-    darray[:] = [x / 180.0 for x in darray]
-
-    t1 = time.time()
-    print '데이터 커밋 시간 : %f seconds' % (t1-t0)
+    # 값의 정규화를 위해 처리.
+    # 자세한 설명은 datains에 있다.
+    darray[:] = [x / 255.0 for x in darray]
 
     result = ls.find(darray)
+    t1 = time.time()
+    print '데이터 검색 시간 : %f seconds' % (t1-t0)
     print "%s" % (result)
 
 if __name__ == '__main__':

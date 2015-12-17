@@ -1,0 +1,8 @@
+3rdparty
+3rdparty/*
+build
+build/*
+dataset
+src/DataInserter/libconn
+*.jpg
+*.jpg

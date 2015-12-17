@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__author__ = 'invi'
+__author__ = 'Doohoon Kim'
 
 import sys
 import struct

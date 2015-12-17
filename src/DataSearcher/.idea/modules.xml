@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$USER_HOME$/Skeletons/Projects/ESImageSearcher/src/DataSearcher/.idea/DataSearcher_1.iml" filepath="$USER_HOME$/Skeletons/Projects/ESImageSearcher/src/DataSearcher/.idea/DataSearcher_1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/DataSearcher.iml" filepath="$PROJECT_DIR$/.idea/DataSearcher.iml" />
     </modules>
   </component>
 </project>
